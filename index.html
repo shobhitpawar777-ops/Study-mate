@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyMate AI</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f8fc;
+      color: #19233d;
+    }
+
+    header {
+      background: white;
+      padding: 18px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e7eaf2;
+    }
+
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #5868e8;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .hero {
+      margin-bottom: 30px;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #6f7890;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid #e7eaf2;
+    }
+
+    .card h2 {
+      margin-top: 0;
+    }
+
+    .upload {
+      border: 2px dashed #b8c2ee;
+      background: #fafbff;
+      padding: 35px 15px;
+      text-align: center;
+      border-radius: 14px;
+      margin-top: 20px;
+    }
+
+    .upload input {
+      margin-top: 15px;
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      background: #5868e8;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #4554d2;
+    }
+
+    .feature {
+      padding: 14px;
+      background: #f5f6ff;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    #results {
+      display: none;
+      margin-top: 25px;
+    }
+
+    .result-section {
+      background: #f8f9ff;
+      padding: 18px;
+      margin-top: 12px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 750px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      StudyMate <span>AI</span>
+    </div>
+    <div>Student Workspace</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Learn Smarter.<br />Revise Better.</h1>
+      <p>
+        Upload your educational material and turn it into exam-ready study notes.
+      </p>
+    </section>
+
+    <div class="container">
+      <section class="card">
+        <h2>Create Study Pack</h2>
+        <p>Upload your notes or paste your chapter.</p>
+
+        <div class="upload">
+          <h3>Upload your study material</h3>
+          <p>PDF, JPG, PNG or TXT</p>
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.txt" />
+        </div>
+
+        <h3>Or paste your notes</h3>
+
+        <textarea id="notes" placeholder="Paste your chapter content here..."></textarea>
+
+        <select id="exam">
+          <option>General Revision</option>
+          <option>JEE Main</option>
+          <option>NEET</option>
+          <option>CBSE Boards</option>
+          <option>College Exams</option>
+        </select>
+
+        <select id="level">
+          <option>School</option>
+          <option>Class 10</option>
+          <option>Class 11</option>
+          <option>Class 12</option>
+          <option>Undergraduate</option>
+          <option>Postgraduate</option>
+        </select>
+
+        <button onclick="generateStudyPack()">Generate Study Pack</button>
+      </section>
+
+      <section class="card">
+        <h2>What you'll get</h2>
+
+        <div class="feature">
+          <h3>📝 Smart Key Points</h3>
+          <p>Important definitions and concepts.</p>
+        </div>
+
+        <div class="feature">
+          <h3>📚 Formula Sheet</h3>
+          <p>Important formulas and explanations.</p>
+        </div>
+
+        <div class="feature">
+          <h3>🎯 Exam Questions</h3>
+          <p>MCQs, numericals and written questions.</p>
+        </div>
+
+        <div class="feature">
+          <h3>⚡ Quick Revision</h3>
+          <p>Short notes for faster revision.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" id="results">
+      <h2>Your Study Pack</h2>
+
+      <div class="result-section">
+        <h3>Key Points</h3>
+        <div id="keyPoints"></div>
+      </div>
+
+      <div class="result-section">
+        <h3>Exam Information</h3>
+        <p id="examInfo"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function generateStudyPack() {
+      const notes = document.getElementById("notes").value.trim();
+      const file = document.getElementById("fileInput").files[0];
+      const exam = document.getElementById("exam").value;
+      const level = document.getElementById("level").value;
+
+      if (!notes && !file) {
+        alert("Please upload a file or paste your notes.");
+        return;
+      }
+
+      if (!notes && file) {
+        alert("File selected! PDF and image extraction will be added in our next development stage.");
+        return;
+      }
+
+      document.getElementById("results").style.display = "block";
+
+      document.getElementById("keyPoints").innerText = notes;
+
+      document.getElementById("examInfo").innerText =
+        "Selected exam: " + exam + " | Level: " + level;
+
+      document.getElementById("results").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  </script>
+</body>
+  </html>
